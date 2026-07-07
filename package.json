@@ -1,0 +1,50 @@
+{
+  "name": "golf-vite",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "format": "prettier --check .",
+    "format:write": "prettier --write .",
+    "preview": "vite preview",
+    "storybook": "storybook dev -p 6006",
+    "storybook:build": "storybook build",
+    "test:unit": "playwright test --project=unit",
+    "test:integration": "PLAYWRIGHT_WEB_SERVER=1 playwright test --project=integration",
+    "test": "yarn test:unit && yarn test:integration"
+  },
+  "dependencies": {
+    "msw": "^2.14.6",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-native": "^0.86.0",
+    "react-native-web": "^0.21.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.61.1",
+    "@storybook/react-vite": "^10.4.6",
+    "@types/node": "^24.13.2",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.3",
+    "eslint": "^10.6.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
+    "globals": "^17.7.0",
+    "prettier": "^3.9.4",
+    "storybook": "^10.4.6",
+    "typescript": "~6.0.2",
+    "typescript-eslint": "^8.63.0",
+    "vite": "^8.1.1"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
+  }
+}
