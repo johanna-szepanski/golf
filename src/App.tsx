@@ -23,35 +23,27 @@ function App() {
   const [errorMessage, setErrorMessage] = useState<string>()
 
   useEffect(() => {
-    let isMounted = true
-
     async function loadPlayers() {
-      try {
-        const response = await fetch('/api/players')
-        if (!response.ok) {
-          throw new Error('Failed to load data')
-        }
+      await fetch('/api/players')
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Failed to load data')
+          }
 
-        const result: { players: Player[] } = await response.json()
-        if (isMounted) {
+          return response.json() as Promise<{ players: Player[] }>
+        })
+        .then((result) => {
           setPlayers(result.players)
-        }
-      } catch {
-        if (isMounted) {
+        })
+        .catch(() => {
           setErrorMessage('Unable to load mock API data.')
-        }
-      } finally {
-        if (isMounted) {
+        })
+        .finally(() => {
           setLoading(false)
-        }
-      }
+        })
     }
 
     void loadPlayers()
-
-    return () => {
-      isMounted = false
-    }
   }, [])
 
   return (
