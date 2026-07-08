@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import App from "../App";
+import { LandingScreen } from "../LandingScreen";
 import { BookCoach } from "../BookCoach";
 
 export function Navigation() {
@@ -8,7 +8,7 @@ export function Navigation() {
       <Routes>
         <Route
           path="/"
-          element={<App />}
+          element={<LandingScreen />}
         />
         <Route
           path="/book-coach"

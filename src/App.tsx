@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet } from "react-native";
-import { ScaledText } from "./lib/typography";
+import { Navigation } from "./navigation";
 
 function App() {
   return (
@@ -7,28 +7,7 @@ function App() {
       style={styles.background}
       contentContainerStyle={styles.content}
     >
-      <ScaledText
-        style={{
-          fontSize: 24,
-          fontWeight: "500",
-          paddingTop: 32,
-          paddingBottom: 16,
-          color: "white"
-        }}
-      >
-        Welcome to Golf Coach Booking App
-      </ScaledText>
-      <ScaledText
-        style={{
-          fontSize: 16,
-          textAlign: "center",
-          paddingHorizontal: 16,
-          paddingBottom: 32,
-          color: "white"
-        }}
-      >
-        Book a golf coach for personalized lessons and improve your game!
-      </ScaledText>
+      <Navigation />
     </ScrollView>
   );
 }
