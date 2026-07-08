@@ -1,105 +1,163 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from "react";
 import {
-  SafeAreaView,
+  ActivityIndicator,
+  ScrollView,
   StyleSheet,
-  Text,
   View,
-  useWindowDimensions,
-} from 'react-native'
-import { LeaderboardCard } from './components/LeaderboardCard'
-import { getDeviceKind, type DeviceKind } from './lib/device'
-
-type Player = {
-  id: string
-  name: string
-  score: number
-}
+  useWindowDimensions
+} from "react-native";
+import { ScaledText } from "./lib/typography";
+import { getDeviceKind } from "./lib/device";
+import { Stepper } from "./Stepper";
+import { ReviewsModal } from "./ReviewsModal";
+import type { Coach } from "./types";
+import { CoachCard } from "./CoachCard";
+import type { HelpTopic } from "./types";
+import { HelpWithStep } from "./HelpWithStep";
+import { PaymentStep } from "./PaymentStep";
+import { StartSessionStep } from "./StartSessionStep";
 
 function App() {
-  const { width } = useWindowDimensions()
-  const deviceKind = getDeviceKind(width)
-  const [players, setPlayers] = useState<Player[]>([])
-  const [loading, setLoading] = useState(true)
-  const [errorMessage, setErrorMessage] = useState<string>()
+  const { width } = useWindowDimensions();
+  const deviceKind = getDeviceKind(width);
+  const [coaches, setCoaches] = useState<Coach[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedCoach, setSelectedCoach] = useState<Coach | null>(null);
+  const [bookedCoach, setBookedCoach] = useState<Coach | null>(null);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [helpTopic, setHelpTopic] = useState<HelpTopic | null>(null);
+  const [description, setDescription] = useState("");
 
   useEffect(() => {
-    async function loadPlayers() {
-      await fetch('/api/players')
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error('Failed to load data')
-          }
+    fetch("/api/coaches")
+      .then((r) => r.json() as Promise<{ coaches: Coach[] }>)
+      .then((data) => setCoaches(data.coaches))
+      .finally(() => setLoading(false));
+  }, []);
 
-          return response.json() as Promise<{ players: Player[] }>
-        })
-        .then((result) => {
-          setPlayers(result.players)
-        })
-        .catch(() => {
-          setErrorMessage('Unable to load mock API data.')
-        })
-        .finally(() => {
-          setLoading(false)
-        })
-    }
+  function handleSelectCoach(coach: Coach) {
+    setBookedCoach(coach);
+    setCurrentStep(1);
+  }
 
-    void loadPlayers()
-  }, [])
+  function handleChangeCoach() {
+    setBookedCoach(null);
+    setCurrentStep(0);
+  }
+
+  function handleNextToPayment() {
+    setCurrentStep(2);
+  }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={[styles.container, containerWidth[deviceKind]]}>
-        <Text style={styles.heading}>Golf Leaderboard</Text>
-        <Text style={styles.caption}>
-          React Native + Vite starter for phone, tablet, and desktop layouts.
-        </Text>
+    <ScrollView
+      style={styles.background}
+      contentContainerStyle={styles.content}
+    >
+      <View
+        style={[styles.inner, deviceKind === "desktop" && styles.innerDesktop]}
+      >
+        <Stepper
+          current={currentStep}
+          deviceKind={deviceKind}
+        />
 
-        {loading && <Text style={styles.status}>Loading players...</Text>}
-        {!loading && errorMessage && (
-          <Text style={styles.status}>{errorMessage}</Text>
+        {currentStep === 0 && (
+          <>
+            {deviceKind !== "phone" && (
+              <ScaledText
+                style={styles.formHeading}
+                accessibilityRole="header"
+              >
+                Select a coach
+              </ScaledText>
+            )}
+            <View
+              accessibilityRole="radiogroup"
+              accessibilityLabel="Available coaches"
+            >
+              {loading && (
+                <ActivityIndicator
+                  color="#ffffff"
+                  style={{ marginTop: 32 }}
+                  accessibilityLabel="Loading coaches"
+                />
+              )}
+              {coaches.map((coach) => (
+                <CoachCard
+                  key={coach.id}
+                  coach={coach}
+                  isSelected={bookedCoach?.id === coach.id}
+                  onSelect={handleSelectCoach}
+                  onReviewsPress={setSelectedCoach}
+                />
+              ))}
+            </View>
+          </>
         )}
-        {!loading &&
-          !errorMessage &&
-          players.map((player) => (
-            <LeaderboardCard key={player.id} player={player} />
-          ))}
-      </View>
-    </SafeAreaView>
-  )
-}
 
-const containerWidth: Record<DeviceKind, { maxWidth: number }> = {
-  phone: { maxWidth: 520 },
-  tablet: { maxWidth: 760 },
-  desktop: { maxWidth: 980 },
+        {currentStep === 1 && bookedCoach && (
+          <HelpWithStep
+            coach={bookedCoach}
+            topic={helpTopic}
+            description={description}
+            onTopicChange={setHelpTopic}
+            onDescriptionChange={setDescription}
+            onChangeCoach={handleChangeCoach}
+            onNext={handleNextToPayment}
+          />
+        )}
+
+        {currentStep === 2 && bookedCoach && helpTopic && (
+          <PaymentStep
+            coach={bookedCoach}
+            topic={helpTopic}
+            description={description}
+            onPay={() => setCurrentStep(3)}
+          />
+        )}
+
+        {currentStep === 3 && bookedCoach && (
+          <StartSessionStep
+            coach={bookedCoach}
+            onStart={() => {
+              /* TODO: launch session */
+            }}
+          />
+        )}
+      </View>
+      <ReviewsModal
+        coach={selectedCoach}
+        onClose={() => setSelectedCoach(null)}
+      />
+    </ScrollView>
+  );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    minHeight: '100%',
-    backgroundColor: '#f5f7fa',
-    alignItems: 'center',
+  background: {
+    flex: 1,
+    backgroundColor: "#1a3a5c"
   },
-  container: {
-    width: '100%',
+  content: {
+    alignItems: "center",
+    paddingBottom: 32
+  },
+  inner: {
+    width: "100%"
+  },
+  innerDesktop: {
+    maxWidth: 700
+  },
+  formHeading: {
+    color: "#ffffff",
+    fontSize: 20,
+    fontWeight: "500",
+    fontFamily: "Cormorant Garamond",
     paddingHorizontal: 16,
-    paddingTop: 32,
-    gap: 8,
-  },
-  heading: {
-    fontSize: 34,
-    fontWeight: '700',
-    color: '#1f2937',
-  },
-  caption: {
-    fontSize: 16,
-    color: '#4b5563',
-    marginBottom: 8,
-  },
-  status: {
-    fontSize: 16,
-    color: '#6b7280',
-  },
-})
+    paddingTop: 8,
+    paddingBottom: 4
+  }
+});
 
-export default App
+export default App;
