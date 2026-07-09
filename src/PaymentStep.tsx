@@ -107,6 +107,19 @@ const paymentStyles = StyleSheet.create({
     fontSize: 17,
     fontWeight: "500",
     fontFamily: "Cormorant Garamond"
+  },
+  backBtn: {
+    padding: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 16,
+    marginTop: 8
+  },
+  backBtnText: {
+    color: "#a0bcd8",
+    fontSize: 16,
+    fontWeight: "500",
+    fontFamily: "Cormorant Garamond"
   }
 });
 
@@ -114,12 +127,14 @@ export const PaymentStep = ({
   coach,
   topic,
   description,
-  onPay
+  onPay,
+  onBack
 }: {
   coach: Coach;
   topic: HelpTopic;
   description: string;
   onPay: () => void;
+  onBack: () => void;
 }) => (
   <View style={paymentStyles.container}>
     <ScaledText
@@ -196,6 +211,15 @@ export const PaymentStep = ({
       accessibilityLabel={`Betala ${coach.price} kronor`}
     >
       <ScaledText style={paymentStyles.payBtnText}>Betala</ScaledText>
+    </Pressable>
+
+    <Pressable
+      style={paymentStyles.backBtn}
+      onPress={onBack}
+      accessibilityRole="button"
+      accessibilityLabel="Tillbaka"
+    >
+      <ScaledText style={paymentStyles.backBtnText}>Tillbaka</ScaledText>
     </Pressable>
   </View>
 );

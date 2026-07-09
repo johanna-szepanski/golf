@@ -108,12 +108,35 @@ export function ReviewsModal({
 
   useEffect(() => {
     if (!coach) return;
+    const controller = new AbortController();
+    let isActive = true;
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setReviews([]);
     setLoading(true);
-    fetch(`/api/coaches/${coach.id}/reviews`)
-      .then((r) => r.json() as Promise<{ reviews: Review[] }>)
-      .then((data) => setReviews(data.reviews))
-      .finally(() => setLoading(false));
+
+    fetch(`/api/coaches/${coach.id}/reviews`, { signal: controller.signal })
+      .then((r) => {
+        if (!r.ok) throw new Error("Network error");
+        return r.json() as Promise<{ reviews: Review[] }>;
+      })
+      .then((data) => {
+        if (isActive) setReviews(data?.reviews || []);
+      })
+      .catch((err) => {
+        if (err.name !== "AbortError" && isActive) {
+          console.error("Failed to fetch reviews:", err);
+          setReviews([]);
+        }
+      })
+      .finally(() => {
+        if (isActive) setLoading(false);
+      });
+
+    return () => {
+      isActive = false;
+      controller.abort();
+    };
   }, [coach]);
 
   return (

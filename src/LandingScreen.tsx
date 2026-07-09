@@ -1,6 +1,9 @@
+import { Pressable } from "react-native";
+import { useNavigate } from "react-router-dom";
 import { ScaledText } from "./lib/typography";
 
 export const LandingScreen = () => {
+  const navigate = useNavigate();
   return (
     <>
       <ScaledText
@@ -25,6 +28,25 @@ export const LandingScreen = () => {
       >
         Book a golf coach for personalized lessons and improve your game!
       </ScaledText>
+      <Pressable
+        onPress={() => navigate("/book-coach")}
+        style={{
+          backgroundColor: "#ffffff",
+          paddingHorizontal: 24,
+          paddingVertical: 12,
+          borderRadius: 8
+        }}
+      >
+        <ScaledText
+          style={{
+            color: "#1a3a5c",
+            fontSize: 18,
+            fontWeight: "500"
+          }}
+        >
+          Book a Coach
+        </ScaledText>
+      </Pressable>
     </>
   );
 };

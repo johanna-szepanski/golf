@@ -49,15 +49,29 @@ const startStyles = StyleSheet.create({
     fontSize: 17,
     fontWeight: "500",
     fontFamily: "Cormorant Garamond"
+  },
+  backBtn: {
+    padding: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%"
+  },
+  backBtnText: {
+    color: "#a0bcd8",
+    fontSize: 16,
+    fontWeight: "500",
+    fontFamily: "Cormorant Garamond"
   }
 });
 
 export const StartSessionStep = ({
   coach,
-  onStart
+  onStart,
+  onBack
 }: {
   coach: Coach;
   onStart: () => void;
+  onBack?: () => void;
 }) => (
   <View style={startStyles.container}>
     <View
@@ -83,5 +97,15 @@ export const StartSessionStep = ({
     >
       <ScaledText style={startStyles.btnText}>Start session</ScaledText>
     </Pressable>
+    {onBack && (
+      <Pressable
+        style={startStyles.backBtn}
+        onPress={onBack}
+        accessibilityRole="button"
+        accessibilityLabel="Tillbaka till början"
+      >
+        <ScaledText style={startStyles.backBtnText}>Tillbaka till början</ScaledText>
+      </Pressable>
+    )}
   </View>
 );

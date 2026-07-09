@@ -46,8 +46,15 @@ export const BookCoach = () => {
 
   useEffect(() => {
     fetch("/api/coaches")
-      .then((r) => r.json() as Promise<{ coaches: Coach[] }>)
-      .then((data) => setCoaches(data.coaches))
+      .then((r) => {
+        if (!r.ok) throw new Error("Network error");
+        return r.json() as Promise<{ coaches: Coach[] }>;
+      })
+      .then((data) => setCoaches(data?.coaches || []))
+      .catch((err) => {
+        console.error("Failed to fetch coaches:", err);
+        setCoaches([]);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -126,6 +133,7 @@ export const BookCoach = () => {
             topic={helpTopic}
             description={description}
             onPay={() => setCurrentStep(3)}
+            onBack={() => setCurrentStep(1)}
           />
         )}
 
@@ -135,6 +143,7 @@ export const BookCoach = () => {
             onStart={() => {
               /* TODO: launch session */
             }}
+            onBack={handleChangeCoach}
           />
         )}
       </View>
