@@ -1,15 +1,15 @@
-import type { Preview } from '@storybook/react-vite'
+import type { Preview } from "@storybook/react-vite";
 
 const preview: Preview = {
   parameters: {
-    layout: 'centered',
+    layout: "centered",
     controls: {
       matchers: {
         color: /(background|color)$/i,
-        date: /Date$/i,
-      },
-    },
-  },
-}
+        date: /Date$/i
+      }
+    }
+  }
+};
 
-export default preview
+export default preview;
